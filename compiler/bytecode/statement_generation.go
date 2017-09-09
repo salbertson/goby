@@ -28,9 +28,9 @@ func (g *Generator) compileStatement(is *InstructionSet, statement ast.Statement
 	scope.line++
 	switch stmt := statement.(type) {
 	case *ast.ExpressionStatement:
-		if !g.REPL && stmt.Expression.IsStmt() {
+		if g.REPL && stmt.Expression.IsExp() {
 			g.compileExpression(is, stmt.Expression, scope, table)
-			is.define(Pop, statement.Line())
+			is.define(Dup, statement.Line())
 
 			return
 		}
@@ -52,8 +52,10 @@ func (g *Generator) compileStatement(is *InstructionSet, statement ast.Statement
 		if stmt.SuperClass != nil {
 			is.define(Pop, statement.Line())
 		}
+		is.define(Pop, statement.Line())
 	case *ast.ModuleStatement:
 		g.compileModuleStmt(is, stmt, scope)
+		is.define(Pop, statement.Line())
 	case *ast.ReturnStatement:
 		g.compileExpression(is, stmt.ReturnValue, scope, table)
 		g.endInstructions(is, stmt.Line())
@@ -112,8 +114,6 @@ func (g *Generator) compileClassStmt(is *InstructionSet, stmt *ast.ClassStatemen
 		is.define(DefClass, stmt.Line(), "class:"+stmt.Name.Value)
 	}
 
-	is.define(Pop, stmt.Line())
-
 	scope = newScope(stmt)
 
 	// compile class's content
@@ -129,7 +129,6 @@ func (g *Generator) compileClassStmt(is *InstructionSet, stmt *ast.ClassStatemen
 func (g *Generator) compileModuleStmt(is *InstructionSet, stmt *ast.ModuleStatement, scope *scope) {
 	is.define(PutSelf, stmt.Line())
 	is.define(DefClass, stmt.Line(), "module:"+stmt.Name.Value)
-	is.define(Pop, stmt.Line())
 
 	scope = newScope(stmt)
 	newIS := &InstructionSet{}

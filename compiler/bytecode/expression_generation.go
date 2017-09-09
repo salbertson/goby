@@ -94,7 +94,12 @@ func (g *Generator) compileCallExpression(is *InstructionSet, exp *ast.CallExpre
 		is.define(Send, exp.Line(), exp.Method, len(exp.Arguments), fmt.Sprintf("block:%d", blockIndex))
 		return
 	}
+
 	is.define(Send, exp.Line(), exp.Method, len(exp.Arguments))
+
+	if exp.IsStmt() {
+		is.define(Pop, exp.Line())
+	}
 }
 
 func (g *Generator) compileAssignExpression(is *InstructionSet, exp *ast.AssignExpression, scope *scope, table *localTable) {
@@ -165,9 +170,11 @@ func (g *Generator) compileIfExpression(is *InstructionSet, exp *ast.IfExpressio
 	}
 
 	if exp.Alternative == nil {
-		// jump over the `putnil` in false case
-		anchorLast.line = is.count + 1
-		is.define(PutNull, exp.Line())
+		if exp.IsExp() {
+			// jump over the `putnil` in false case
+			anchorLast.line = is.count + 1
+			is.define(PutNull, exp.Line())
+		}
 
 		return
 	}

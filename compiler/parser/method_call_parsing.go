@@ -39,6 +39,8 @@ func (p *Parser) parseCallExpressionWithoutReceiver(receiver ast.Expression) ast
 }
 
 func (p *Parser) parseCallExpressionWithReceiver(receiver ast.Expression) ast.Expression {
+	receiver.MarkAsExp()
+
 	exp := &ast.CallExpression{BaseNode: &ast.BaseNode{}}
 
 	oldState := p.fsm.Current()

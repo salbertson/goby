@@ -363,6 +363,8 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	}
 
 	exp.Right = p.parseExpression(precedence)
+	exp.Left.MarkAsExp()
+	exp.Right.MarkAsExp()
 
 	return exp
 }
@@ -395,8 +397,15 @@ func (p *Parser) parseAssignExpression(v ast.Expression) ast.Expression {
 		*/
 
 		if v.Method == "[]" {
-			value = p.expandAssignmentValue(v)
+			/*
+				a[i] += 1
 
+				or
+
+				a[1] = 1
+			*/
+			v.MarkAsExp()
+			value = p.expandAssignmentValue(v)
 			callExp := &ast.CallExpression{
 				BaseNode:  &ast.BaseNode{},
 				Method:    "[]=",
@@ -423,6 +432,7 @@ func (p *Parser) parseAssignExpression(v ast.Expression) ast.Expression {
 
 	exp.Token = tok
 	exp.Value = value
+	exp.Value.MarkAsExp()
 
 	event, _ := eventTable[oldState]
 	p.fsm.Event(event)
