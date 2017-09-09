@@ -7,8 +7,8 @@ import (
 
 // BaseNode holds the attribute every expression or statement should have
 type BaseNode struct {
-	Token  token.Token
-	isStmt bool
+	Token token.Token
+	isExp bool
 }
 
 // Line returns node's token's line number
@@ -18,22 +18,22 @@ func (b *BaseNode) Line() int {
 
 // IsExp returns if current node should be considered as an expression
 func (b *BaseNode) IsExp() bool {
-	return !b.isStmt
+	return b.isExp
 }
 
 // IsStmt returns if current node should be considered as a statement
 func (b *BaseNode) IsStmt() bool {
-	return b.isStmt
+	return !b.isExp
 }
 
 // MarkAsStmt marks current node to be statement
 func (b *BaseNode) MarkAsStmt() {
-	b.isStmt = true
+	b.isExp = false
 }
 
 // MarkAsExp marks current node to be expression
 func (b *BaseNode) MarkAsExp() {
-	b.isStmt = false
+	b.isExp = true
 }
 
 type node interface {
