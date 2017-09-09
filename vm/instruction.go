@@ -155,21 +155,6 @@ var builtinActions = map[operationType]*action{
 			}
 
 			cf.insertLCL(index, depth, p.Target)
-
-			var obj Object
-
-			switch v := p.Target.(type) {
-			case *HashObject:
-				obj = v.copy()
-			case *ArrayObject:
-				obj = v.copy()
-			case *ChannelObject:
-				obj = v.copy()
-			default:
-				obj = v
-			}
-
-			t.stack.push(&Pointer{Target: obj})
 		},
 	},
 	bytecode.SetConstant: {
