@@ -404,12 +404,11 @@ var builtinActions = map[operationType]*action{
 			is := t.getClassIS(subjectName, cf.instructionSet.filename)
 
 			t.stack.pop()
+
 			c := newCallFrame(is)
 			c.self = classPtr.Target
 			t.callFrameStack.push(c)
 			t.startFromTopFrame()
-
-			t.stack.push(classPtr)
 		},
 	},
 	bytecode.Send: {
