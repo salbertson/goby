@@ -155,9 +155,19 @@ func (co *callObject) hasKeywordArgument(name string) (index int, result bool) {
 	return
 }
 
-func (co *callObject) normalParamsCount() (n int) {
+func (co *callObject) hasSplatArgument() bool {
+	for _, at := range co.argTypes() {
+		if at == bytecode.SplatArg {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (co *callObject) countParams(paramType int) (n int) {
 	for _, at := range co.paramTypes() {
-		if at == bytecode.NormalArg {
+		if at == paramType {
 			n++
 		}
 	}
@@ -165,9 +175,9 @@ func (co *callObject) normalParamsCount() (n int) {
 	return
 }
 
-func (co *callObject) normalArgsCount() (n int) {
+func (co *callObject) countArgs(argType int) (n int) {
 	for _, at := range co.argTypes() {
-		if at == bytecode.NormalArg {
+		if at == argType {
 			n++
 		}
 	}

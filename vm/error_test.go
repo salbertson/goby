@@ -327,7 +327,7 @@ func TestKeywordArgumentError(t *testing.T) {
 
 		foo(y: 1)
 		`,
-			"ArgumentError: Expect at most 0 args for method 'foo'. got: 1",
+			"ArgumentError: unknown key y for method foo",
 			5, 1},
 		{`def foo(x)
 		  x
@@ -335,7 +335,7 @@ func TestKeywordArgumentError(t *testing.T) {
 
 		foo(y: 1)
 		`,
-			"ArgumentError: unknown key y for method foo",
+			"ArgumentError: Expect at least 1 args for method 'foo'. got: 0",
 			5, 1},
 		{`def foo(x = 10)
 		  x
@@ -367,8 +367,45 @@ func TestKeywordArgumentError(t *testing.T) {
 
 		foo(y: 1, x: 100)
 		`,
-			"ArgumentError: Expect at most 1 args for method 'foo'. got: 2",
+			"ArgumentError: unknown key y for method foo",
 			5, 1},
+		{`
+		def foo(a:)
+		end
+
+		foo
+		`, "ArgumentError: Method foo requires key argument a", 5, 1},
+		{`
+		def foo(a:, b:)
+		end
+
+		foo
+		`, "ArgumentError: Method foo requires key argument a", 5, 1},
+		{`
+		def foo(a:, b:)
+		end
+
+		foo(b: 10)
+		`, "ArgumentError: Method foo requires key argument a", 5, 1},
+		// With default value
+		{`
+		def foo(a: 10)
+		end
+
+		foo(10)
+		`, "ArgumentError: Expect at most 0 args for method 'foo'. got: 1", 5, 1},
+		{`
+		def foo(a:, b: 10)
+		end
+
+		foo(10)
+		`, "ArgumentError: Expect at most 0 args for method 'foo'. got: 1", 5, 1},
+		{`
+		def foo(a, b:)
+		end
+
+		foo(b: 10)
+		`, "ArgumentError: Expect at least 1 args for method 'foo'. got: 0", 5, 1},
 	}
 
 	for i, tt := range tests {

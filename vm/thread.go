@@ -342,18 +342,42 @@ func (t *thread) evalBuiltinMethod(receiver Object, method *BuiltinMethodObject,
 
 // TODO: Move instruction into call object
 func (t *thread) evalMethodObject(call *callObject, sourceLine int) {
-	normalParamsCount := call.normalParamsCount()
 	paramTypes := call.paramTypes()
-	paramsCount := len(call.paramTypes())
 	stack := t.stack.Data
 
-	if call.argCount > paramsCount && !call.method.isSplatArgIncluded() {
-		t.reportArgumentError(sourceLine, paramsCount, call.methodName(), call.argCount, call.receiverPtr)
+	totalArgCount := t.sp - call.argPtr()
+	normalParamsCount := call.countParams(bytecode.NormalArg)
+	optionedParamsCount := call.countParams(bytecode.OptionedArg)
+	normalArgsCount := call.countArgs(bytecode.NormalArg)
+	optionedArgsCount := call.countArgs(bytecode.OptionedArg)
+
+	if call.method.isSplatArgIncluded() {
+		// Normal arguments less than required
+		if (normalArgsCount + optionedArgsCount) < normalParamsCount {
+			t.reportArgumentError(sourceLine, normalParamsCount, call.methodName(), normalArgsCount, call.receiverPtr)
+		}
 	}
 
-	if normalParamsCount > call.argCount {
-		t.reportArgumentError(sourceLine, normalParamsCount, call.methodName(), call.argCount, call.receiverPtr)
+	// Normal arguments less than required
+	if (normalArgsCount + optionedArgsCount) < normalParamsCount && !call.method.isSplatArgIncluded() {
+		if call.hasSplatArgument() {
+			t.reportArgumentError(sourceLine, normalParamsCount, call.methodName(), totalArgCount, call.receiverPtr)
+		} else {
+			t.reportArgumentError(sourceLine, normalParamsCount, call.methodName(), normalArgsCount, call.receiverPtr)
+		}
+
 	}
+
+	// Normal arguments more than required
+	if normalArgsCount > (normalParamsCount + optionedParamsCount) && !call.method.isSplatArgIncluded(){
+		if optionedParamsCount > 0 {
+			t.reportArgumentError(sourceLine, normalParamsCount+optionedParamsCount, call.methodName(), normalArgsCount, call.receiverPtr)
+		} else {
+			t.reportArgumentError(sourceLine, normalParamsCount, call.methodName(), normalArgsCount, call.receiverPtr)
+		}
+	}
+
+
 
 	// Check if arguments include all the required keys before assign keyword arguments
 	for paramIndex, paramType := range paramTypes {
