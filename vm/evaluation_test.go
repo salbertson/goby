@@ -669,15 +669,34 @@ func TestMethodCallWithSplatArgument(t *testing.T) {
 
 		bar(1, 2, 3, 5)
 		`, 11},
+		{`
+		def foo(a, b, c:)
+          a + b + c
+		end
+
+		s = [1,2]
+
+		foo(c: 10, *s)
+		`, 13},
+		{`
+		def foo(a, b, c:)
+          a + b + c
+		end
+
+		foo(c: 10, *[1,2])
+		`, 13},
+		{`
+		def foo(x, a, b, c:)
+          a + b - x + c
+		end
+
+		foo(c: 10, 5, *[1,2])
+		`, 8},
 	}
 
 	for i, tt := range tests {
 		v := initTestVM()
 		evaluated := v.testEval(t, tt.input, getFilename())
-
-		if isError(evaluated) {
-			t.Fatalf("got Error: %s", evaluated.(*Error).message)
-		}
 
 		checkExpected(t, i, evaluated, tt.expected)
 		v.checkCFP(t, i, 0)

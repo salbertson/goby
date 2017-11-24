@@ -206,7 +206,7 @@ func (t *thread) execInstruction(cf *normalCallFrame, i *instruction) {
 	//fmt.Println(i.inspect())
 	i.action.operation(t, i.sourceLine, cf, i.Params...)
 	//fmt.Println("============================")
-	//fmt.Println(t.callFrameStack.inspect())
+	//fmt.Println(t.stack.inspect())
 }
 
 func (t *thread) builtinMethodYield(blockFrame *normalCallFrame, args ...Object) *Pointer {
@@ -345,9 +345,20 @@ func (t *thread) evalMethodObject(call *callObject, sourceLine int) {
 	paramTypes := call.paramTypes()
 	stack := t.stack.Data
 
+	/*
+		This is different from the call.argCount, for example:
+
+		```ruby
+		foo(*[1,2], 3) # total count: 3, call.argCount: 2
+		foo(1, 2, 3) # total count: 3, call.argCount: 3
+		```
+	*/
+
 	totalArgCount := t.sp - call.argPtr()
 	normalParamsCount := call.countParams(bytecode.NormalArg)
 	optionedParamsCount := call.countParams(bytecode.OptionedArg)
+	requiredKeywordParamsCount := call.countParams(bytecode.RequiredKeywordArg)
+	optionedKeywordParamsCount := call.countParams(bytecode.OptionalKeywordArg)
 	normalArgsCount := call.countArgs(bytecode.NormalArg)
 	optionedArgsCount := call.countArgs(bytecode.OptionedArg)
 
@@ -357,27 +368,25 @@ func (t *thread) evalMethodObject(call *callObject, sourceLine int) {
 			t.reportArgumentError(sourceLine, normalParamsCount, call.methodName(), normalArgsCount, call.receiverPtr)
 		}
 	}
-
 	// Normal arguments less than required
-	if (normalArgsCount + optionedArgsCount) < normalParamsCount && !call.method.isSplatArgIncluded() {
+	if (normalArgsCount+optionedArgsCount) < normalParamsCount && !call.method.isSplatArgIncluded() {
 		if call.hasSplatArgument() {
-			t.reportArgumentError(sourceLine, normalParamsCount, call.methodName(), totalArgCount, call.receiverPtr)
+			if (totalArgCount - requiredKeywordParamsCount - optionedKeywordParamsCount) != normalParamsCount {
+				t.reportArgumentError(sourceLine, normalParamsCount, call.methodName(), totalArgCount, call.receiverPtr)
+			}
 		} else {
 			t.reportArgumentError(sourceLine, normalParamsCount, call.methodName(), normalArgsCount, call.receiverPtr)
 		}
-
 	}
 
 	// Normal arguments more than required
-	if normalArgsCount > (normalParamsCount + optionedParamsCount) && !call.method.isSplatArgIncluded(){
+	if normalArgsCount > (normalParamsCount+optionedParamsCount) && !call.method.isSplatArgIncluded() {
 		if optionedParamsCount > 0 {
 			t.reportArgumentError(sourceLine, normalParamsCount+optionedParamsCount, call.methodName(), normalArgsCount, call.receiverPtr)
 		} else {
 			t.reportArgumentError(sourceLine, normalParamsCount, call.methodName(), normalArgsCount, call.receiverPtr)
 		}
 	}
-
-
 
 	// Check if arguments include all the required keys before assign keyword arguments
 	for paramIndex, paramType := range paramTypes {
@@ -405,13 +414,37 @@ func (t *thread) evalMethodObject(call *callObject, sourceLine int) {
 			case bytecode.NormalArg, bytecode.OptionedArg:
 				call.assignNormalAndOptionedArguments(paramIndex, stack)
 			case bytecode.SplatArg:
-				call.argIndex = paramIndex
+				call.argStackPtr = paramIndex
 				call.assignSplatArgument(stack, t.vm.initArrayObject([]Object{}))
 			}
 		}
 	} else {
 		call.assignNormalArguments(stack)
 	}
+
+	//if call.hasSplatArgument() {
+	//	limit := normalParamsCount + optionedParamsCount
+	//
+	//
+	//	if call.method.isSplatArgIncluded() {
+	//		limit++
+	//	}
+	//
+	//	splatIndex := 0
+	//
+	//	for argIndex, at := range call.argTypes() {
+	//		if at == bytecode.SplatArg {
+	//			splatIndex = argIndex
+	//		}
+	//	}
+	//
+	//	for i := 0; i < limit; i++ {
+	//		data := t.stack.Data[call.argPtr()+splatIndex].Target
+	//		splatIndex++
+	//		call.callFrame.insertLCL(call.lastArgIndex+1,0, data)
+	//		call.lastArgIndex++
+	//	}
+	//}
 
 	t.callFrameStack.push(call.callFrame)
 	t.startFromTopFrame()

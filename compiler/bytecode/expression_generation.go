@@ -111,6 +111,11 @@ func (g *Generator) compileCallExpression(is *InstructionSet, exp *ast.CallExpre
 				if ok {
 					argSet.setArg(i, ident.Value, SplatArg)
 				}
+
+				_, ok = arg.Right.(*ast.ArrayExpression)
+				if ok {
+					argSet.setArg(i, "", SplatArg)
+				}
 			}
 		}
 
