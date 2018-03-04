@@ -81,6 +81,8 @@ const (
 	GetBlock = "GET_BLOCK"
 	Class    = "CLASS"
 	Module   = "MODULE"
+	Begin    = "BEGIN"
+	Rescue   = "RESCUE"
 
 	ResolutionOperator = "::"
 )
@@ -106,6 +108,8 @@ var keywords = map[string]Type{
 	"module":    Module,
 	"break":     Break,
 	"get_block": GetBlock,
+	"begin":     Begin,
+	"rescue":    Rescue,
 }
 
 // LookupIdent is used for keyword identification

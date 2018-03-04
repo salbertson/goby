@@ -28,6 +28,8 @@ func TestLookupIdentTrue(t *testing.T) {
 		"yield":     Yield,
 		"nil":       Null,
 		"get_block": GetBlock,
+		"begin":     Begin,
+		"rescue":    Rescue,
 	}
 
 	for name, token := range keywords {
