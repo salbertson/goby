@@ -180,6 +180,47 @@ func (ws *WhileStatement) String() string {
 	return out.String()
 }
 
+type RescueStatement struct {
+	*BaseNode
+	Exception Expression
+	Body      *BlockStatement
+}
+
+func (rs *RescueStatement) statementNode() {}
+func (rs *RescueStatement) TokenLiteral() string {
+	return rs.Token.Literal
+}
+func (rs *RescueStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("rescue ")
+	out.WriteString(rs.Exception.String())
+	out.WriteString("\n")
+	out.WriteString(rs.Body.String())
+	out.WriteString("\n")
+
+	return out.String()
+}
+
+type BeginStatement struct {
+	*BaseNode
+	RescueStatement *RescueStatement
+	Body            *BlockStatement
+}
+
+func (bs *BeginStatement) statementNode() {}
+func (bs *BeginStatement) TokenLiteral() string {
+	return bs.Token.Literal
+}
+func (bs *BeginStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("begin\n")
+	out.WriteString(bs.Body.String())
+	out.WriteString(bs.RescueStatement.String())
+	return out.String()
+}
+
 type BlockStatement struct {
 	*BaseNode
 	Statements []Statement

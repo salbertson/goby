@@ -10,6 +10,13 @@ import (
  BaseNode
 */
 
+// IsBeginStmt fails the test and returns nil by default
+func (b *BaseNode) IsBeginStmt(t *testing.T) (tbs *TestableBeginStatement) {
+	t.Helper()
+	t.Fatalf(nodeFailureMsgFormat, "begin statement", b)
+	return nil
+}
+
 // IsClassStmt fails the test and returns nil by default
 func (b *BaseNode) IsClassStmt(t *testing.T) *TestableClassStatement {
 	t.Helper()
@@ -31,6 +38,13 @@ func (b *BaseNode) IsReturnStmt(t *testing.T) *TestableReturnStatement {
 	return nil
 }
 
+// IsRescueStmt fails the test and returns nil by default
+func (b *BaseNode) IsRescueStmt(t *testing.T) *TestableRescueStatement {
+	t.Helper()
+	t.Fatalf(nodeFailureMsgFormat, "rescue statement", b)
+	return nil
+}
+
 // IsDefStmt fails the test and returns nil by default
 func (b *BaseNode) IsDefStmt(t *testing.T) *TestableDefStatement {
 	t.Helper()
@@ -45,17 +59,15 @@ func (b *BaseNode) IsWhileStmt(t *testing.T) (ws *TestableWhileStatement) {
 	return nil
 }
 
-/*
- ClassStatement
-*/
+// IsBeginStmt returns a pointer of the begin statement
+func (bs *BeginStatement) IsBeginStmt(t *testing.T) *TestableBeginStatement {
+	return &TestableBeginStatement{t: t, BeginStatement: bs}
+}
 
+// IsClassStmt returns a pointer of the class statement
 func (cs *ClassStatement) IsClassStmt(t *testing.T) *TestableClassStatement {
 	return &TestableClassStatement{t: t, ClassStatement: cs}
 }
-
-/*
- Module Statement
-*/
 
 // IsModuleStmt returns a pointer of the module statement
 func (ms *ModuleStatement) IsModuleStmt(t *testing.T) *TestableModuleStatement {
@@ -65,6 +77,11 @@ func (ms *ModuleStatement) IsModuleStmt(t *testing.T) *TestableModuleStatement {
 // IsDefStmt returns a pointer of the DefStatement
 func (ds *DefStatement) IsDefStmt(t *testing.T) *TestableDefStatement {
 	return &TestableDefStatement{DefStatement: ds, t: t}
+}
+
+// IsRescueStmt returns a pointer of the RescueStatement
+func (rs *RescueStatement) IsRescueStmt(t *testing.T) (trs *TestableRescueStatement) {
+	return &TestableRescueStatement{t: t, RescueStatement: rs}
 }
 
 // IsDefStmt returns a pointer of the ReturnStatement

@@ -9,11 +9,13 @@ import (
 type TestableStatement interface {
 	Statement
 	// Test Helpers
+	IsBeginStmt(t *testing.T) *TestableBeginStatement
 	IsClassStmt(t *testing.T) *TestableClassStatement
 	IsDefStmt(t *testing.T) *TestableDefStatement
 	IsExpression(t *testing.T) TestableExpression
 	IsModuleStmt(t *testing.T) *TestableModuleStatement
 	IsReturnStmt(t *testing.T) *TestableReturnStatement
+	IsRescueStmt(t *testing.T) *TestableRescueStatement
 	IsWhileStmt(t *testing.T) *TestableWhileStatement
 }
 
@@ -21,6 +23,23 @@ type CodeBlock []TestableStatement
 
 func (cb CodeBlock) NthStmt(n int) TestableStatement {
 	return cb[n-1]
+}
+
+/*TestableBeginStatement*/
+
+type TestableBeginStatement struct {
+	*BeginStatement
+	t *testing.T
+}
+
+func (tbs *TestableBeginStatement) BeginBody() CodeBlock {
+	var tss []TestableStatement
+
+	for _, stmt := range tbs.Body.Statements {
+		tss = append(tss, stmt.(TestableStatement))
+	}
+
+	return tss
 }
 
 /*TestableClassStatement*/
@@ -212,6 +231,27 @@ func (tms *TestableModuleStatement) ShouldHasName(name string) {
 		tms.t.Helper()
 		tms.t.Fatalf("Wrong class, this class is %s", tms.Name.Value)
 	}
+}
+
+/*TestableRescueStatement*/
+
+type TestableRescueStatement struct {
+	*RescueStatement
+	t *testing.T
+}
+
+func (trs *TestableRescueStatement) RescuedError() TestableExpression {
+	return trs.Exception.(TestableExpression)
+}
+
+func (trs *TestableRescueStatement) RescueBody() CodeBlock {
+	var tss []TestableStatement
+
+	for _, stmt := range trs.Body.Statements {
+		tss = append(tss, stmt.(TestableStatement))
+	}
+
+	return tss
 }
 
 /*TestableReturnStatement*/
