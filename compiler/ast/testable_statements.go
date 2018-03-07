@@ -42,6 +42,10 @@ func (tbs *TestableBeginStatement) BeginBody() CodeBlock {
 	return tss
 }
 
+func (tbs *TestableBeginStatement) TestableRescueStmt() *TestableRescueStatement {
+	return &TestableRescueStatement{t: tbs.t, RescueStatement: tbs.RescueStatement}
+}
+
 /*TestableClassStatement*/
 
 type TestableClassStatement struct {
@@ -240,11 +244,11 @@ type TestableRescueStatement struct {
 	t *testing.T
 }
 
-func (trs *TestableRescueStatement) RescuedError() TestableExpression {
+func (trs *TestableRescueStatement) TestableRescuedError() TestableExpression {
 	return trs.Exception.(TestableExpression)
 }
 
-func (trs *TestableRescueStatement) RescueBody() CodeBlock {
+func (trs *TestableRescueStatement) TestableBody() CodeBlock {
 	var tss []TestableStatement
 
 	for _, stmt := range trs.Body.Statements {

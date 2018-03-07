@@ -14,6 +14,8 @@ func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.Return:
 		return p.parseReturnStatement()
+	case token.Begin:
+		return p.parseBeginStatement()
 	case token.Def:
 		return p.parseDefMethodStatement()
 	case token.Comment:
@@ -210,6 +212,21 @@ func (p *Parser) checkMethodParameters(params []ast.Expression) {
 			checkedParams = append(checkedParams, param)
 		}
 	}
+}
+
+func (p *Parser) parseBeginStatement() *ast.BeginStatement {
+	bs := &ast.BeginStatement{BaseNode: &ast.BaseNode{Token: p.curToken}}
+	bs.Body = p.parseBlockStatement(token.Rescue)
+	bs.RescueStatement = p.parseRescueStatement()
+	return bs
+}
+
+func (p *Parser) parseRescueStatement() *ast.RescueStatement {
+	rs := &ast.RescueStatement{BaseNode: &ast.BaseNode{Token: p.curToken}}
+	p.nextToken()
+	rs.Exception = p.parseExpression(precedence.Normal)
+	rs.Body = p.parseBlockStatement(token.End)
+	return rs
 }
 
 func (p *Parser) parseClassStatement() *ast.ClassStatement {

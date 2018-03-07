@@ -179,3 +179,50 @@ func TestWhileStatementWithoutDoKeywordFail(t *testing.T) {
 	}
 
 }
+
+func TestBeginAndRescueStatement(t *testing.T) {
+	input := `
+	def bar(x, y)
+	  r = 0
+	  begin
+		r = x + y
+	  rescue Foo
+		r = x + 10
+	  end
+	end
+`
+	l := lexer.New(input)
+	p := New(l)
+	program, err := p.ParseProgram()
+
+	if err != nil {
+		t.Fatal(err.Message)
+	}
+
+	stmt := program.FirstStmt().IsDefStmt(t)
+	stmt.ShouldHasName("bar")
+	stmt.ShouldHasNormalParam("x")
+	stmt.ShouldHasNormalParam("y")
+
+	assignment := stmt.MethodBody().NthStmt(1).IsExpression(t).IsAssignExpression(t)
+	assignment.NthVariable(1).IsIdentifier(t).ShouldHasName("r")
+	assignment.TestableValue().IsIntegerLiteral(t).ShouldEqualTo(0)
+
+	beginStmt := stmt.MethodBody().NthStmt(2).IsBeginStmt(t)
+
+	beginBodyAssignment := beginStmt.BeginBody()[0].IsExpression(t).IsAssignExpression(t)
+	beginBodyAssignment.NthVariable(1).IsIdentifier(t).ShouldHasName("r")
+	infix1 := beginBodyAssignment.TestableValue().IsInfixExpression(t)
+	infix1.ShouldHasOperator("+")
+	infix1.TestableLeftExpression().IsIdentifier(t).ShouldHasName("x")
+	infix1.TestableRightExpression().IsIdentifier(t).ShouldHasName("y")
+
+	rescueStmt := beginStmt.TestableRescueStmt()
+	rescueStmt.TestableRescuedError().IsConstant(t).ShouldHasName("Foo")
+	rescueBodyAssignment := rescueStmt.TestableBody().NthStmt(1).IsExpression(t).IsAssignExpression(t)
+	rescueBodyAssignment.NthVariable(1).IsIdentifier(t).ShouldHasName("r")
+	infix2 := rescueBodyAssignment.TestableValue().IsInfixExpression(t)
+	infix2.ShouldHasOperator("+")
+	infix2.TestableLeftExpression().IsIdentifier(t).ShouldHasName("x")
+	infix2.TestableRightExpression().IsIntegerLiteral(t).ShouldEqualTo(10)
+}
