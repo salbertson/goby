@@ -464,6 +464,43 @@ func builtinFloatInstanceMethods() []*BuiltinMethodObject {
 			},
 		},
 		{
+			//  Rounds float to a given precision in decimal digits (default 0 digits)
+			//
+			// ```Ruby
+			// 1.115.round  # => 1
+			// 1.115.round(1)  # => 1.1
+			// 1.115.round(2)  # => 1.12
+			// -1.115.round  # => -1
+			// -1.115.round(1)  # => -1.1
+			// -1.115.round(2)  # => -1.12
+			// ```
+			// @return [Integer]
+			Name: "round",
+			Fn: func(receiver Object, sourceLine int) builtinMethodBody {
+				return func(t *thread, args []Object, blockFrame *normalCallFrame) Object {
+					var precision int
+
+					if len(args) > 1 {
+						return t.vm.initErrorObject(errors.ArgumentError, sourceLine, "Expect 0 or 1 argument. got=%v", strconv.Itoa(len(args)))
+					} else if len(args) == 1 {
+						int, ok := args[0].(*IntegerObject)
+
+						if !ok {
+							return t.vm.initErrorObject(errors.TypeError, sourceLine, errors.WrongArgumentTypeFormat, classes.IntegerClass, args[0].Class().Name)
+						}
+
+						precision = int.value
+					}
+
+
+					f := receiver.(*FloatObject).floatValue()
+					n := math.Pow10(precision)
+
+					return t.vm.initFloatObject(math.Round(f*n)/n)
+				}
+			},
+		},
+		{
 			// Returns true if Float is less than 0.0
 			//
 			// ```Ruby
