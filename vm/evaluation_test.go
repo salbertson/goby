@@ -2325,6 +2325,27 @@ func TestMultiVarAssignment(t *testing.T) {
 	}
 }
 
+func TestPlusPrefixMethodCall(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"+5", 5},
+		{"+10", 10},
+		{"+(+10)", 10},
+		{"-(+5)", -5},
+		{"+(-5)", -5},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
 func TestPostfixMethodCall(t *testing.T) {
 	tests := []struct {
 		input    string
