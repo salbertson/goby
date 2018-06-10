@@ -18,6 +18,7 @@ type TestableExpression interface {
 	IsIdentifier(t *testing.T) *TestableIdentifier
 	IsIfExpression(t *testing.T) *TestableIfExpression
 	IsInfixExpression(t *testing.T) *TestableInfixExpression
+	IsPrefixExpression(t *testing.T) *TestablePrefixExpression
 	IsInstanceVariable(t *testing.T) *TestableInstanceVariable
 	IsIntegerLiteral(t *testing.T) *TestableIntegerLiteral
 	IsSelfExpression(t *testing.T) *TestableSelfExpression
@@ -219,6 +220,25 @@ func (tie *TestableInfixExpression) TestableLeftExpression() TestableExpression 
 // RightExpression returns infix expression's right expression as TestingExpression
 func (tie *TestableInfixExpression) TestableRightExpression() TestableExpression {
 	return tie.Right.(TestableExpression)
+}
+
+// TestablePrefixExpression
+type TestablePrefixExpression struct {
+	*PrefixExpression
+	t *testing.T
+}
+
+// ShouldHasOperator checks if the infix expression has expected operator
+func (tpe *TestablePrefixExpression) ShouldHasOperator(expectedOperator string) {
+	if tpe.Operator != expectedOperator {
+		tpe.t.Helper()
+		tpe.t.Fatalf("Expect prefix expression to have %s operator, got %s", expectedOperator, tpe.Operator)
+	}
+}
+
+// RightExpression returns infix expression's right expression as TestingExpression
+func (tpe *TestablePrefixExpression) TestableRightExpression() TestableExpression {
+	return tpe.Right.(TestableExpression)
 }
 
 // TestableInstanceVariable

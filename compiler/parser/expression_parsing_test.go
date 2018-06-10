@@ -542,6 +542,31 @@ func TestInfixExpression(t *testing.T) {
 	}
 }
 
+func TestPrefixExpression(t *testing.T) {
+	prefixTests := []struct {
+		input      string
+		operator   string
+		rightValue int
+	}{
+		{"+4", "+", 4},
+		{"-2", "-", 2},
+	}
+
+	for _, tt := range prefixTests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program, err := p.ParseProgram()
+
+		if err != nil {
+			t.Fatal(err.Message)
+		}
+
+		exp := program.FirstStmt().IsExpression(t).IsPrefixExpression(t)
+		exp.ShouldHasOperator(tt.operator)
+		exp.TestableRightExpression().IsIntegerLiteral(t).ShouldEqualTo(tt.rightValue)
+	}
+}
+
 func TestIntegerLiteralExpression(t *testing.T) {
 	input := `5;`
 

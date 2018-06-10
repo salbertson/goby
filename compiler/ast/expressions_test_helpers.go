@@ -92,6 +92,13 @@ func (b *BaseNode) IsInfixExpression(t *testing.T) (ie *TestableInfixExpression)
 	return
 }
 
+// IsPrefixExpression fails the test and returns nil by default
+func (b *BaseNode) IsPrefixExpression(t *testing.T) (ie *TestablePrefixExpression) {
+	t.Helper()
+	t.Fatalf(nodeFailureMsgFormat, "prefix expression", b)
+	return
+}
+
 // IsInstanceVariable fails the test and returns nil by default
 func (b *BaseNode) IsInstanceVariable(t *testing.T) (ie *TestableInstanceVariable) {
 	t.Helper()
@@ -179,6 +186,11 @@ func (ie *IfExpression) IsIfExpression(t *testing.T) *TestableIfExpression {
 // IsInfixExpression returns pointer of the receiver infix expression
 func (ie *InfixExpression) IsInfixExpression(t *testing.T) *TestableInfixExpression {
 	return &TestableInfixExpression{InfixExpression: ie, t: t}
+}
+
+// IsPrefixExpression returns pointer of the receiver prefix expression
+func (pe *PrefixExpression) IsPrefixExpression(t *testing.T) *TestablePrefixExpression {
+	return &TestablePrefixExpression{PrefixExpression: pe, t: t}
 }
 
 // IsInstanceVariable returns pointer of the receiver instance variable
