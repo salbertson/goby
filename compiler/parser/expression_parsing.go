@@ -363,9 +363,10 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 	prevToken := p.curToken
 	p.nextToken()
 
-	if prevToken.Type == token.Bang {
+	switch prevToken.Type {
+	case token.Bang:
 		pe.Right = p.parseExpression(precedence.BangPrefix)
-	} else {
+	default:
 		pe.Right = p.parseExpression(precedence.MinusPrefix)
 	}
 
