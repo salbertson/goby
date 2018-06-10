@@ -239,7 +239,7 @@ func (g *Generator) compilePrefixExpression(is *InstructionSet, exp *ast.PrefixE
 	case "*":
 		g.compileExpression(is, exp.Right, scope, table)
 		is.define(SplatArray, exp.Line())
-	case "-":
+	case "-", "+":
 		is.define(PutObject, exp.Line(), 0)
 		g.compileExpression(is, exp.Right, scope, table)
 		is.define(Send, exp.Line(), exp.Operator, 1, "")
