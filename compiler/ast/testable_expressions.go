@@ -222,7 +222,7 @@ func (tie *TestableInfixExpression) TestableRightExpression() TestableExpression
 	return tie.Right.(TestableExpression)
 }
 
-// TestablePrefixExpression
+// TestablePrefixExpression ...
 type TestablePrefixExpression struct {
 	*PrefixExpression
 	t *testing.T
@@ -236,7 +236,7 @@ func (tpe *TestablePrefixExpression) ShouldHasOperator(expectedOperator string) 
 	}
 }
 
-// RightExpression returns infix expression's right expression as TestingExpression
+// TestableRightExpression returns prefix expression's right expression as TestingExpression
 func (tpe *TestablePrefixExpression) TestableRightExpression() TestableExpression {
 	return tpe.Right.(TestableExpression)
 }
