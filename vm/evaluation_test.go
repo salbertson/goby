@@ -2346,6 +2346,681 @@ func TestPlusPrefixMethodCall(t *testing.T) {
 	}
 }
 
+func TestMultiplePrefixMethodCallWithOne(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"1+1", 2},
+		{"1-1", 0},
+		{"1+0", 1},
+		{"1-0", 1},
+
+		{"1+-0", 1},
+		{"1++0", 1},
+		{"1-+0", 1},
+		{"1--0", 1},
+
+		{"1+-1", 0},
+		{"1++1", 2},
+		{"1-+1", 0},
+		{"1--1", 2},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodCallWithPlusOne(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"+1+1", 2},
+		{"+1-1", 0},
+		{"+1+0", 1},
+		{"+1-0", 1},
+
+		{"+1+-0", 1},
+		{"+1++0", 1},
+		{"+1-+0", 1},
+		{"+1--0", 1},
+
+		{"+1+-1", 0},
+		{"+1++1", 2},
+		{"+1-+1", 0},
+		{"+1--1", 2},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodCallWithMinusOne(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"-1+1", 0},
+		{"-1-1", -2},
+		{"-1+0", -1},
+		{"-1-0", -1},
+
+		{"-1+-0", -1},
+		{"-1++0", -1},
+		{"-1-+0", -1},
+		{"-1--0", -1},
+
+		{"-1+-1", -2},
+		{"-1++1", 0},
+		{"-1-+1", -2},
+		{"-1--1", 0},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodCallWithZero(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"0+1", 1},
+		{"0-1", -1},
+		{"0+0", 0},
+		{"0-0", -0},
+
+		{"0+-1", -1},
+		{"0++1", 1},
+		{"0-+1", -1},
+		{"0--1", 1},
+
+		{"0+-1", -1},
+		{"0++1", 1},
+		{"0-+1", -1},
+		{"0--1", 1},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodCallWithPlusZero(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"+0+1", 1},
+		{"+0-1", -1},
+		{"+0+0", 0},
+		{"+0-0", -0},
+
+		{"+0+-1", -1},
+		{"+0++1", 1},
+		{"+0-+1", -1},
+		{"+0--1", 1},
+
+		{"+0+-1", -1},
+		{"+0++1", 1},
+		{"+0-+1", -1},
+		{"+0--1", 1},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodCallWithMinusZero(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"-0+1", 1},
+		{"-0-1", -1},
+		{"-0+0", 0},
+		{"-0-0", -0},
+
+		{"-0+-1", -1},
+		{"-0++1", 1},
+		{"-0-+1", -1},
+		{"-0--1", 1},
+
+		{"-0+-1", -1},
+		{"-0++1", 1},
+		{"-0-+1", -1},
+		{"-0--1", 1},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodCallWithPlusPlusZero(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"++1+1", 2},
+		{"++1-1", 0},
+		{"++1+0", 1},
+		{"++1-0", 1},
+
+		{"++1+-0", 1},
+		{"++1++0", 1},
+		{"++1-+0", 1},
+		{"++1--0", 1},
+
+		{"++1+-1", 0},
+		{"++1++1", 2},
+		{"++1-+1", 0},
+		{"++1--1", 2},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodCallWithMinusMinusZero(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"--0+-1", -1},
+
+		{"--0++1", 1},
+		{"--0-+1", -1},
+		{"--0--1", 1},
+
+		{"--0+-1", -1},
+		{"--0++1", 1},
+		{"--0-+1", -1},
+		{"--0--1", 1},
+
+		{"--0+-0", 0},
+		{"--0++0", 0},
+		{"--0-+0", 0},
+		{"--0--0", 0},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodCallWithPlusMinusOne(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"+-1+1", 0},
+		{"+-1-1", -2},
+		{"+-1+0", -1},
+		{"+-1-0", -1},
+
+		{"+-1+-0", -1},
+		{"+-1++0", -1},
+		{"+-1-+0", -1},
+		{"+-1--0", -1},
+
+		{"+-1+-1", -2},
+		{"+-1++1", 0},
+		{"+-1-+1", -2},
+		{"+-1--1", 0},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodCallWithMinusPlusOne(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"-+1+1", 0},
+		{"-+1-1", -2},
+		{"-+1+0", -1},
+		{"-+1-0", -1},
+
+		{"-+1+-0", -1},
+		{"-+1++0", -1},
+		{"-+1-+0", -1},
+		{"-+1--0", -1},
+
+		{"-+1+-1", -2},
+		{"-+1++1", 0},
+		{"-+1-+1", -2},
+		{"-+1--1", 0},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodCallWithMinusMinusOne(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"--1+-1", 0},
+
+		{"--1++1", 2},
+		{"--1-+1", 0},
+		{"--1--1", 2},
+
+		{"--1+-1", 0},
+		{"--1++1", 2},
+		{"--1-+1", 0},
+		{"--1--1", 2},
+
+		{"--1+-0", 1},
+		{"--1++0", 1},
+		{"--1-+0", 1},
+		{"--1--0", 1},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodCallUnary(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+
+		// 52-94
+		{"+1", 1},
+		{"++1", 1},
+		{"+-1", -1},
+		{"-+1", -1},
+		{"-1", -1},
+		{"--1", 1},
+
+		{"+0", 0},
+		{"++0", 0},
+		{"+-0", 0},
+		{"-+0", 0},
+		{"-0", 0},
+		{"--0", 0},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodCallUnaryParentheses(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"(+1)", 1},
+		{"+(1)", 1},
+		{"+(+1)", 1},
+		{"+(-1)", -1},
+		{"(-1)", -1},
+		{"-(1)", -1},
+		{"-(-1)", 1},
+
+		{"(+0)", 0},
+		{"+(+0)", 0},
+		{"+(0)", 0},
+		{"+(-0)", 0},
+		{"(-0)", 0},
+		{"-(0)", 0},
+		{"-(-0)", 0},
+
+		{"(+0+1)", 1},
+		{"-(+0+1)", -1},
+		{"(1+1)", 2},
+		{"-(1+1)", -2},
+		{"(+1+1)", 2},
+		{"-(+1+1)", -2},
+
+		{"(-1+1)", 0},
+		{"-(-1+1)", 0},
+		{"(-1-1)", -2},
+		{"-(-1-1)", 2},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodSparseExpressionWithMultipleSigns(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{"1 -1", 0},
+		{"1 - 1", 0},
+		{"1---1", 0},
+		{"1----1", 2},
+		{"-1 -1", -2},
+		{"-1 - 1", -2},
+		{"-1---1", -2},
+		{"-1----1", 0},
+		{"-1 +1", 0},
+		{"-1 + 1", 0},
+		{"-1+--1", 0},
+		{"-1+---1", -2},
+		{"1+--1", 2},
+		{"1+---1", 0},
+		{"+++1", 1},
+		{"++++1", 1},
+		{"---1", -1},
+		{"----1", 1},
+		{"1-+-1", 2},
+		{"--+- -++-- -1", -1},
+		{"--+ -++-- - 1", 1},
+		{"(--+- -++-- - 1)", -1},
+		{"(--+ -++-- -1)", 1},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodVariableWithSigns(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+
+		{
+			`a=1
+				+a`,
+			1,
+		},
+		{
+			`a=1
+				-a`,
+			-1,
+		},
+		{
+			`a=0
+				+a`,
+			0,
+		},
+		{
+			`a=0
+				-a`,
+			0,
+		},
+		{
+			`a=-1
+				+a`,
+			-1,
+		},
+		{
+			`a=-1
+				-a`,
+			1,
+		},
+
+		{
+			"a=1; +a", // TODO: needs fix: Some panic happen token: (. Line: 0
+			1,
+		},
+		{
+			"a=1;(+a)", // TODO: needs fix: Some panic happen token: (. Line: 0
+			1,
+		},
+		{
+			"a=1;(++a)", // TODO: needs fix: Some panic happen token: (. Line: 0
+			1,
+		},
+		{
+			"a=1;++a", // TODO: needs fix: Some panic happen token: (. Line: 0
+			1,
+		},
+		{
+			"a=1;+++a", // TODO: needs fix: Some panic happen token: (. Line: 0
+			1,
+		},
+		{
+			"a=1;-a", // TODO: needs fix: Some panic happen token: (. Line: 0
+			-1,
+		},
+		{
+			"a=1;(--a)", // TODO: needs fix: Some panic happen token: (. Line: 0
+			1,
+		},
+		{
+			"a=1;--a", // TODO: needs fix: Some panic happen token: (. Line: 0
+			1,
+		},
+		{
+			"a=1;---a", // TODO: needs fix: Some panic happen token: (. Line: 0
+			-1,
+		},
+		{
+			"a=1;(+a+1)", // TODO: needs fix: Some panic happen token: (. Line: 0
+			2,
+		},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodInstanceVariableWithSigns(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{
+			`
+			class Foo
+				def initialize
+					@a = 1
+				end
+				def bar
+					+@a
+				end
+			end
+			Foo.new.bar`,
+			1,
+		},
+		{
+			`
+			class Foo
+				def initialize
+					@a = 1
+				end
+				def bar
+					-@a
+				end
+			end
+			Foo.new.bar`,
+			-1,
+		},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodArrayWithSigns(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{
+			"+[1, 2][0]", // TypeError: Expect argument to be Numeric. got: Array
+			1,
+		},
+		{
+			"-[1, 2][0]", // TypeError: Expect argument to be Numeric. got: Array
+			-1,
+		},
+		{
+			"[1, 2][+0]",
+			1,
+		},
+		{
+			"+[1, 2][-0]", // TypeError: Expect argument to be Numeric. got: Array
+			1,
+		},
+		{
+			"[1, 2][+1]",
+			2,
+		},
+		{
+			"[1, 2][-1]",
+			2,
+		},
+		{
+			"[+1][0]",
+			1,
+		},
+		{
+			"[+1, +2][0]",
+			1,
+		},
+		{
+			"[-1, -2][0]",
+			-1,
+		},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
+func TestMultiplePrefixMethodHashWithSigns(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int
+	}{
+		{
+			"{ a: 1 }[:a]",
+			1,
+		},
+		{
+			"{ a: +1 }[:a]",
+			1,
+		},
+		{
+			"-{ a: 1 }[:a]", // TypeError: Expect argument to be Numeric. got: Array
+			-1,
+		},
+		{
+			"+{ a: +1 }[:a]", // TypeError: Expect argument to be Numeric. got: Array
+			1,
+		},
+		{
+			"+{ a: +0 }[:a]", // TypeError: Expect argument to be Numeric. got: Array
+			0,
+		},
+		{
+			"{ a: -0 }[:a]",
+			0,
+		},
+		{
+			"{ a: -1 }[:a]",
+			-1,
+		},
+		{
+			"{ x: -1, y: -0 }[:x]",
+			-1,
+		},
+	}
+
+	for i, tt := range tests {
+		v := initTestVM()
+		evaluated := v.testEval(t, tt.input, getFilename())
+		VerifyExpected(t, i, evaluated, tt.expected)
+		v.checkCFP(t, i, 0)
+		v.checkSP(t, i, 1)
+	}
+}
+
 func TestPostfixMethodCall(t *testing.T) {
 	tests := []struct {
 		input    string
