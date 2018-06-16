@@ -15,9 +15,9 @@ const (
 	Sum
 	Product
 	BangPrefix
-	Index
 	Call
 	MinusPrefix
+	Index
 )
 
 // LookupTable maps token to its corresponding precedence
