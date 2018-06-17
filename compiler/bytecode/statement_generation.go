@@ -35,6 +35,10 @@ func (g *Generator) compileStatement(is *InstructionSet, statement ast.Statement
 	scope.line++
 	switch stmt := statement.(type) {
 	case *ast.ExpressionStatement:
+		if stmt.Expression == nil {
+			return
+		}
+
 		if !g.REPL && stmt.Expression.IsStmt() {
 			g.compileExpression(is, stmt.Expression, scope, table)
 			is.define(Pop, statement.Line())

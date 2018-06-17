@@ -163,6 +163,10 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 
 	leftExp := parseFn()
 
+	if leftExp == nil {
+		return nil
+	}
+
 	/*
 		Precedence example:
 
@@ -192,10 +196,6 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 		}
 
 		leftExp = infixFn(leftExp)
-	}
-
-	if p.peekTokenIs(token.Semicolon) {
-		p.nextToken()
 	}
 
 	return leftExp

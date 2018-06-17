@@ -2865,7 +2865,7 @@ func TestMultiplePrefixMethodVariableWithSigns(t *testing.T) {
 			-1,
 		},
 		{
-			"a=1;(+a+1)", // TODO: needs fix: Some panic happen token: (. Line: 0
+			"a=1;+a+1", // TODO: needs fix: Some panic happen token: (. Line: 0
 			2,
 		},
 	}
