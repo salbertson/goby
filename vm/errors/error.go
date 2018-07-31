@@ -34,4 +34,5 @@ const (
 	CantYieldWithoutBlockFormat = "Can't yield without a block"
 	DividedByZero               = "Divided by 0"
 	ChannelIsClosed             = "The channel is already closed."
+	PositiveValue               = "Expect argument to be positive value. got: %d"
 )
